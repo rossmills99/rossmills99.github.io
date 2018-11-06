@@ -1,0 +1,13 @@
+<div>
+	<div class="col-md-4" class="originalVideo">
+		<video style="width: 240px; height: 180px" #myVideo></video>
+		<label class="text-info" tooltip="This is the untouched web cam image.">Original</label>
+	</div>
+	<div *ngFor="let vid of vids">
+		<div class="col-md-4">
+			<app-rm-vid [vid]="vid"></app-rm-vid>
+			<label class="text-info">{{vid.title}}</label>
+		</div>
+	</div>
+</div>
+
