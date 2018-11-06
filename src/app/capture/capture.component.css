@@ -1,0 +1,41 @@
+div.vid-container {
+  width: 30%;
+  margin-bottom: 30px;
+}
+
+div.vid-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+
+.vid-title {
+  background-color: #133;
+  color: #aad;
+  margin-top: -4px;
+  padding: 4px;
+}
+
+@keyframes colorchange {
+  0% { }
+  100% { 
+    background-color: #aff;
+    color: #013; 
+  }
+}
+
+
+button.play-btn {
+  width: 300px;
+  height: 100px;
+  left: calc(50vw - 150px);
+  top: calc(50vh - 50px + 30px);
+  background-color: #133;
+  color: #aad;
+  transition: all 2s ease-in;
+  text-align: center;
+}
+
+.play-btn:hover {
+  animation: colorchange 1s linear 1s infinite alternate; 
+}

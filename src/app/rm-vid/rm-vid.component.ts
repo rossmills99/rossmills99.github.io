@@ -21,8 +21,8 @@ export class RmVidComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    var w = this.vid.w;
-    var h = this.vid.h;
+    var w = this.vid.video.clientWidth;
+    var h = this.vid.video.clientHeight;
     var canvas = <HTMLCanvasElement>this.canvas.nativeElement;
     var vid = this.vid;
     
@@ -41,14 +41,10 @@ export class RmVidComponent implements OnInit {
         console.log("video paused/ended");
         return false;
       }
-
       bcontext.drawImage(video, 0, 0, w, h);
 
       var idata = bcontext.getImageData(0, 0, w, h);
-      
-      idata = vid.effect(idata);
-
-      context.putImageData(idata, 0, 0);
+      context.putImageData(vid.effect(idata), 0, 0);
 
       setTimeout(draw, 50, video, context, bcontext, w, h);
     }
