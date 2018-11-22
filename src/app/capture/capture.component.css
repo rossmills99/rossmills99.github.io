@@ -16,26 +16,14 @@ div.vid-row {
   padding: 4px;
 }
 
-@keyframes colorchange {
-  0% { }
-  100% { 
-    background-color: #aff;
-    color: #013; 
-  }
-}
-
-
 button.play-btn {
-  width: 300px;
-  height: 100px;
-  left: calc(50vw - 150px);
-  top: calc(50vh - 50px + 30px);
-  background-color: #133;
+  border: none;
+  padding: 15px;
+  background-color: #588;
   color: #aad;
-  transition: all 2s ease-in;
-  text-align: center;
+  transition: all .4s ease-in;
 }
 
 .play-btn:hover {
-  animation: colorchange 1s linear 1s infinite alternate; 
+  background-color: #311;
 }

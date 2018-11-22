@@ -10,9 +10,10 @@
     <div>
       <app-rm-vid [vid]="vid"></app-rm-vid>
     </div>
-    <div class="vid-title">
+    <div class="vid-title" [hidden]="!playing">
       {{vid.title}}
     </div>
   </div>
 </div>
+<div><button class="play-btn" [hidden]="!playing" (click)="stop()">Stop</button>
 

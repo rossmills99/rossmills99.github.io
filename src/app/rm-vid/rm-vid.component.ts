@@ -1,8 +1,6 @@
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 
-interface IVidDescription {
-  w: number,
-  h: number,
+export interface IVidDescription {
   video: HTMLVideoElement,
   effect: (any) => any,
   title: string
@@ -33,10 +31,10 @@ export class RmVidComponent implements OnInit {
     bcanvas.width = w;
     bcanvas.height = h
 
-    var context = canvas.getContext('2d');
-    var bcontext = bcanvas.getContext('2d');
+    var context: CanvasRenderingContext2D = canvas.getContext('2d');
+    var bcontext: CanvasRenderingContext2D = bcanvas.getContext('2d');
 
-    function draw(video, context, bcontext, w, h) {
+    function draw(video, context: CanvasRenderingContext2D, bcontext: CanvasRenderingContext2D, w, h) {
       if(video.paused || video.ended) {
         console.log("video paused/ended");
         return false;
@@ -46,7 +44,7 @@ export class RmVidComponent implements OnInit {
       var idata = bcontext.getImageData(0, 0, w, h);
       context.putImageData(vid.effect(idata), 0, 0);
 
-      setTimeout(draw, 50, video, context, bcontext, w, h);
+      setTimeout(draw, 200, video, context, bcontext, w, h);
     }
     
     var video = vid.video;
