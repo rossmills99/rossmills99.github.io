@@ -178,12 +178,12 @@ function getEffects(video) {
         var offset = row * trueWidth;
         for(var i = 0; i < trueWidth; i += 4) {
           var it = offset + i;
-          var inc = -(Math.abs(middleRow - row) / middleRow) * 80;
-          inc = inc + -(Math.abs(middleWidth - i) / middleWidth) * 80;
+          var inc = -(Math.abs(middleRow - row) / middleRow) * 180;
+          inc = inc + -(Math.abs(middleWidth - i) / middleWidth) * 180;
 
-          data[it] = (data[it] + inc);
-          data[it + 1] = data[it + 1] + inc;
-          data[it + 2] = data[it + 2] + inc;
+          data[it] = (data[it] - inc);
+          data[it + 1] = data[it + 1] - inc;
+          data[it + 2] = data[it + 2] - inc;
         }
       }
       return new ImageData(data, idata.width);
@@ -257,6 +257,21 @@ function getVids (video, effects): IVidDescription[] {
       },
       {
         video: video,
+        effect: effects.slices,
+        title: "Slices"
+      },
+      {
+        video: video,
+        effect: effects.darkEdges,
+        title: "Vignette"
+      },
+      {
+        video: video,
+        effect: effects.mirror,
+        title: "Mirror"
+      },
+      {
+        video: video,
         effect: effects.grey,
         title: "Greyscale"
       },
@@ -274,21 +289,6 @@ function getVids (video, effects): IVidDescription[] {
         video: video,
         effect: effects.green,
         title: "Greenness"
-      },
-      {
-        video: video,
-        effect: effects.darkEdges,
-        title: "Diamond"
-      },
-      {
-        video: video,
-        effect: effects.slices,
-        title: "Slices"
-      },
-      {
-        video: video,
-        effect: effects.mirror,
-        title: "Mirror"
       }
     ];
 } // end getVids
