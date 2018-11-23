@@ -19,11 +19,14 @@ div.vid-row {
 button.play-btn {
   border: none;
   padding: 15px;
-  background-color: #588;
+  background-color: #311;
+  border: 1px solid #422;
   color: #aad;
-  transition: all .4s ease-in;
+  transition: all .3s ease-in;
+  cursor: pointer;
 }
 
 .play-btn:hover {
-  background-color: #311;
+  background-color: #422;
+  border: 1px solid #311;
 }

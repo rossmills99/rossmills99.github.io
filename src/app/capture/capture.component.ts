@@ -2,83 +2,58 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { IVidDescription } from '../rm-vid/rm-vid.component';
 let done = false;
 
-// The whole thing's a bit slow
-function convolve(neighbourhood: number[], matrix: number[]) {
-  if(neighbourhood.length !== matrix.length * 4) {
-    throw 'neighbourhood must be matrix length * 4';
-  }
-  const offset = 0;
-  const newVal = { r: offset, g: offset, b: offset, a: offset };
-  const l = matrix.length;
-
-  const kernalSum = matrix.reduce((a,b) => a += b);
-
-  // Divide by zero though...
-  const normalisedKernel = matrix.map(element => element / Math.max(Math.abs(kernalSum), .1);
-
-  for(let i = 0; i < l; i += 1) {
-    var cidx = i * 4; // component index
-    var rgbVals = [neighbourhood[cidx], neighbourhood[cidx+1], neighbourhood[cidx+2]];
-
-    // Could possibly do this for greyscale edge detection?
-    var avg = rgbVals.reduce((a,b) => a += b) / rgbVals.length;
-    var avgVal = avg * matrix[matrix.length - i - 1];
-
-    rgbVals = rgbVals.map(v => v * normalisedKernel[matrix.length - i - 1]);
-    newVal.r += rgbVals[0];
-    newVal.g += rgbVals[1];
-    newVal.b += rgbVals[2];
-    newVal.a += neighbourhood[cidx+3]; // leave alpha channel untouched
-  }
-  if(!done) {
-    console.log('convolve', neighbourhood, matrix);
-    console.log('newVal', newVal);
-    console.log('normal kernel', normalisedKernel);
-  }
-  done = true;
-  return newVal;
-}
-
-function getPixelComponents(data, i) {
-  return [data[i], data[i+1], data[i+2], data[i+3]];
-}
+const kernel = [
+  [0, -1, 0],
+  [-1, 4, -1],
+  [0, -1, 0]
+];
 
 function getEffects(video) {
   return {
-    edgeDetect: function(idata: ImageData) {
-      var data = idata.data;
-      var limit = data.length - 4;
+    // Inspired by https://github.com/ytiurin/imagefilter/blob/master/apply-filter.js
+    edgeDetect: function( imageData ) {
+      var width = imageData.width;
+      var height = imageData.height;
+      imageData = imageData.data;
 
-      var contextWidth = idata.width;
-      var trueWidth = contextWidth * 4;
+      var newImageData = new ImageData(width, height);
 
-      const matrix = [
-        -1, 0, -1,
-        0, 4, 0,
-        -1, 0, -1
-      ];
+      var kernelLength = kernel.length;
+      var kernelHalf = Math.floor( kernel.length / 2 );
 
-      for(let i = 0; i < limit; i += 4) {
-        let neighbourhood = [
-            Math.max(0, i - trueWidth - 4),
-            Math.max(0, i - trueWidth),
-            Math.max(0, i - trueWidth + 4),
-            Math.max(0, i - 4),
-            i,
-            (i + 4) % data.length,
-            (i + trueWidth - 4) % data.length,
-            (i + trueWidth) % data.length,
-            (i + trueWidth + 4) % data.length
-          ]
-          .map(idx => getPixelComponents(data, idx))
-          .reduce((a, b) => a.concat(b));
+      for (var imageDataIdx = 0; imageDataIdx < imageData.length; imageDataIdx++) {
+        var pixelChannel = (imageDataIdx % 4);
+        var pixelIdx = Math.floor(imageDataIdx / 4);
 
-        let newVal = convolve(neighbourhood, matrix);
-        data[i] = Math.min(255, Math.max(0, newVal.r));
-        data[i+1] = Math.min(255, Math.max(0, newVal.g));
-        data[i+2] = Math.min(255, Math.max(0, newVal.b));
+        // skip alpha channel
+        if (pixelChannel === 3) {
+          newImageData.data[imageDataIdx] = imageData[imageDataIdx];
+          continue;
+        }
+
+        var pixelY = Math.floor(pixelIdx / width);
+        var pixelX = (pixelIdx % width);
+        var grades = [];
+        var imageDataVal = 0.5;
+
+        // Iterate weights row
+        for ( var kernelY = 0; kernelY < kernelLength; kernelY++ ) {
+          var gY = pixelY + kernelY - kernelHalf;
+          gY = gY < 0 ? 0 : (gY >= height ? height - 1 : gY);
+          // continue
+          // Iterate weights column in row
+          for (var kernelX = 0; kernelX < kernelLength; kernelX++ ) {
+            var gX = pixelX + kernelX - kernelHalf;
+            gX = gX < 0 ? 0 : (gX >= width ? width - 1 : gX);
+
+            imageDataVal += imageData[gY * width * 4 + gX * 4 + pixelChannel]
+              * kernel[kernelY][kernelX];
+          }
+        }
+        newImageData.data[imageDataIdx] = imageDataVal;
       }
-      return new ImageData(data, idata.width);
+
+      return newImageData;
     },
     grey: function(idata) {
       var data = idata.data;
@@ -275,46 +250,46 @@ function getVids (video, effects): IVidDescription[] {
         effect: effects.edgeDetect,
         title: "Edge detect"
       },
-      // {
-      //   video: video,
-      //   effect: effects.splitMirror,
-      //   title: "Mirror Split"
-      // },
-      // {
-      //   video: video,
-      //   effect: effects.grey,
-      //   title: "Greyscale"
-      // },
-      // {
-      //   video: video,
-      //   effect: effects.red,
-      //   title: "Redness"
-      // },
-      // {
-      //   video: video,
-      //   effect: effects.blue,
-      //   title: "Blueness"
-      // },
-      // {
-      //   video: video,
-      //   effect: effects.green,
-      //   title: "Greenness"
-      // },
-      // {
-      //   video: video,
-      //   effect: effects.darkEdges,
-      //   title: "Diamond"
-      // },
-      // {
-      //   video: video,
-      //   effect: effects.slices,
-      //   title: "Slices"
-      // },
-      // {
-      //   video: video,
-      //   effect: effects.mirror,
-      //   title: "Mirror"
-      // }
+      {
+        video: video,
+        effect: effects.splitMirror,
+        title: "Mirror Split"
+      },
+      {
+        video: video,
+        effect: effects.grey,
+        title: "Greyscale"
+      },
+      {
+        video: video,
+        effect: effects.red,
+        title: "Redness"
+      },
+      {
+        video: video,
+        effect: effects.blue,
+        title: "Blueness"
+      },
+      {
+        video: video,
+        effect: effects.green,
+        title: "Greenness"
+      },
+      {
+        video: video,
+        effect: effects.darkEdges,
+        title: "Diamond"
+      },
+      {
+        video: video,
+        effect: effects.slices,
+        title: "Slices"
+      },
+      {
+        video: video,
+        effect: effects.mirror,
+        title: "Mirror"
+      }
     ];
 } // end getVids
 
